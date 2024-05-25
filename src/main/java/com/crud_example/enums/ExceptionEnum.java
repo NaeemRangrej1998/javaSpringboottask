@@ -2,7 +2,8 @@ package com.crud_example.enums;
 
 public enum ExceptionEnum {
 
-    SOMETHING_WENT_WRONG("Something went wrong");
+    SOMETHING_WENT_WRONG("Something went wrong"),
+    ORGANIZATION_ENTITY_NOT_FOUND("Organization Entity Not Found");
 
     private String value;
 

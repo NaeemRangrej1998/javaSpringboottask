@@ -17,7 +17,13 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * <h1>OrganizationServiceImpl</h1>
+ *
+ * <p>
+ * This ServiceImpl will be used to manage all Organization related apis
+ * </p>
+ */
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
@@ -45,6 +51,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         return this.mapToOrganizationResponseDTO(organizationEntity);
     }
 
+    /**
+     * <p>
+     * Fetch Organization Details  it's active or deactivate. Implemented
+     * </p>
+     * @return OrganizationResponseDTO
+     */
     @Override
     public List<OrganizationResponseDTO> getOrganizationDetails() {
         List<OrganizationEntity> organizationEntityList=organizationRepository.findByStatusAndDeactivate(true,false);
@@ -53,31 +65,38 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     /**
+     * <p>
+     * Get Organization Details based on Id
+     * </p>
      *
-     * @param id
-     * @return
-     *
+     * @param organizationId contain the organization id
+     * @return OrganizationResponseDTO
      */
     @Override
     public OrganizationResponseDTO getOrganizationDetailById(Long id) {
-        OrganizationEntity organizationEntity=organizationRepository.findByIdAndStatusAndDeactivate(id,true,false);
+        OrganizationEntity organizationEntity = organizationRepository
+                .findByIdAndStatusAndDeactivate(id, true, false)
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
         OrganizationResponseDTO responseDTO= dtoMapper.convertToDotWithStandardStrategy(organizationEntity,OrganizationResponseDTO.class);
         return responseDTO;
     }
 
     /**
+     * <p>
+     * Insert/Update Organization Status based on organizationId
+     * </p>
      *
-     * @param organizationRequestDTO
-     * @return
+     * @param organizationId contain the organization id
+     * @return OrganizationResponseDTO
      */
     @Override
-    public OrganizationResponseDTO updateOrganization(OrganizationRequestDTO organizationRequestDTO) {
+    public OrganizationResponseDTO insertUpdateOrganization(OrganizationRequestDTO organizationRequestDTO) {
         OrganizationEntity organizationEntity;
         // Check if organizationId is provided
         if (organizationRequestDTO.getId() != null) {
             // Fetch existing organization entity
             organizationEntity = organizationRepository.findById(organizationRequestDTO.getId()).orElseThrow(() -> {
-                return new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.NOT_FOUND);
+                return new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
             });
             organizationEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
             organizationEntity.setStatus(true);
@@ -103,6 +122,15 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organizationResponseDTO;
     }
 
+    /**
+     * <p>
+     * Update Organization Status based on Active/DeActive
+     * </p>
+     *
+     * @param organizationId contain the organization id
+     * @param activeStatus   contain the active/deactivate status
+     * @return OrganizationResponseDTO
+     */
     @Override
     public OrganizationResponseDTO updateOrganizationStatus(Long organizationId, Boolean activeStatus) {
         OrganizationEntity organizationEntity = organizationRepository.findById(organizationId).orElseThrow(() -> {
@@ -120,6 +148,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organizationResponseDTO;
     }
 
+    /**
+     * <p>
+     *     This methos id used for convert Entity To DTO
+     * </p>
+     * @param organizationEntity
+     * @return OrganizationResponseDTO
+     */
     private OrganizationResponseDTO mapToOrganizationResponseDTO(OrganizationEntity organizationEntity) {
         return dtoMapper.convertToDotWithStandardStrategy(organizationEntity, OrganizationResponseDTO.class);
     }
