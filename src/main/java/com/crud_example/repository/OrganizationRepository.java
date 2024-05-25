@@ -1,6 +1,8 @@
 package com.crud_example.repository;
 
 import com.crud_example.entity.OrganizationEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +27,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
      * @return List<OrganizationEntity> &lt;OrganizationEntity&gt;
      *
      */
-    List<OrganizationEntity> findByStatusAndDeactivate(Boolean status, Boolean deactivate);
+    Page<OrganizationEntity> findByStatusAndDeactivate(Boolean status, Boolean deactivate, String name, Pageable pageable);
 
 
     /**

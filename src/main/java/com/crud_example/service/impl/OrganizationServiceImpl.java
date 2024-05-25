@@ -9,6 +9,9 @@ import com.crud_example.mapper.DtoMapper;
 import com.crud_example.repository.OrganizationRepository;
 import com.crud_example.service.OrganizationService;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -58,10 +61,16 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @return OrganizationResponseDTO
      */
     @Override
-    public List<OrganizationResponseDTO> getOrganizationDetails() {
-        List<OrganizationEntity> organizationEntityList=organizationRepository.findByStatusAndDeactivate(true,false);
-        return dtoMapper.mapListOfEntityToDTOWithStandardStrategy(organizationEntityList ,new TypeToken<List<OrganizationResponseDTO>>() {
-        });
+    public Page<OrganizationResponseDTO> getOrganizationDetails(Pageable pageable, String searchValue) {
+        System.out.println("organizationEntityList = " );
+        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByStatusAndDeactivate(true,
+        false, "%" + searchValue + "%", pageable);
+        System.out.println("organizationEntityList = " + organizationEntityList.stream().toList());
+        List<OrganizationResponseDTO> organizationResponseDTOList = this
+                .mapToListOfOrganizationResponseDTO(organizationEntityList.getContent());
+
+        return new PageImpl<>(organizationResponseDTOList, pageable, organizationEntityList.getTotalElements());
+
     }
 
     /**
@@ -157,5 +166,12 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     private OrganizationResponseDTO mapToOrganizationResponseDTO(OrganizationEntity organizationEntity) {
         return dtoMapper.convertToDotWithStandardStrategy(organizationEntity, OrganizationResponseDTO.class);
+    }
+
+    private List<OrganizationResponseDTO> mapToListOfOrganizationResponseDTO(
+            List<OrganizationEntity> organizationEntityList) {
+        return dtoMapper.mapListOfEntityToDTOWithStandardStrategy(organizationEntityList,
+                TypeToken.of(new TypeToken<List<OrganizationResponseDTO>>() {
+                }.getType()));
     }
 }

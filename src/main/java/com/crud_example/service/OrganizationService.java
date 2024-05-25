@@ -28,7 +28,7 @@ public interface OrganizationService {
      * @return OrganizationResponseDTO
      *
      */
-    List<OrganizationResponseDTO> getOrganizationDetails();
+    Page<OrganizationResponseDTO> getOrganizationDetails(Pageable pageable, String searchValue);
     /**
      * <p>
      * getOrganizationDetailById  Details By Id

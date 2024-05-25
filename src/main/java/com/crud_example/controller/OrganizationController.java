@@ -6,6 +6,10 @@ import com.crud_example.dto.OrganizationResponseDTO;
 import com.crud_example.enums.ExceptionEnum;
 import com.crud_example.exception.CustomException;
 import com.crud_example.service.OrganizationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -62,10 +66,14 @@ public class OrganizationController {
      * @Param OrganizationRequestDTO it's contain organization details
      * @return ResponseEntity &lt;ApiResponse&gt;
      */
-    @GetMapping(value = "/getAllOrganization", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> getOrganization() {
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> getOrganization( @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
+                                                        @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                        @RequestParam(value = "searchValue", required = false, defaultValue = "") String searchValue,
+                                                        @RequestParam(value = "sortAs", required = false, defaultValue = "ASC") Sort.Direction sortAs) {
         try {
-            List<OrganizationResponseDTO> organizationEntities = organizationService.getOrganizationDetails();
+            Pageable pageable= PageRequest.of(pageNo,pageSize,Sort.by(sortAs,"name"));
+            Page<OrganizationResponseDTO> organizationEntities = organizationService.getOrganizationDetails(pageable, searchValue.trim());
             return new ResponseEntity<>(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_LIST.getValue(), organizationEntities),HttpStatus.OK);
 
         }   catch (CustomException e) {
