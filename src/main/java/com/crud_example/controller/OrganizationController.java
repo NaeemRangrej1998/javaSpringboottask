@@ -6,6 +6,11 @@ import com.crud_example.dto.OrganizationResponseDTO;
 import com.crud_example.enums.ExceptionEnum;
 import com.crud_example.exception.CustomException;
 import com.crud_example.service.OrganizationService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +48,7 @@ public class OrganizationController {
      * @return ResponseEntity &lt;ApiResponse&gt;
      */
     @PostMapping(value = "/addOranization", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> insertOrganization(@RequestBody
+    public ResponseEntity<ApiResponse> insertOrganization(@Valid @RequestBody
             OrganizationRequestDTO organizationRequestDTO) {
         try {
             organizationRequestDTO.setId(null);
@@ -112,7 +117,7 @@ public class OrganizationController {
      * @return ResponseEntity &lt;ApiResponse&gt;
      */
     @PutMapping(value = "/updateOrgnanization/{organizationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrganization(@PathVariable Long organizationId,@RequestBody OrganizationRequestDTO organizationRequestDTO ) {
+    public ResponseEntity<ApiResponse> updateOrganization(@PathVariable Long organizationId,@Valid @RequestBody OrganizationRequestDTO organizationRequestDTO ) {
 
         try {
             organizationRequestDTO.setId(organizationId);

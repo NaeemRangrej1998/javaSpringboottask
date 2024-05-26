@@ -27,7 +27,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
      * @return List<OrganizationEntity> &lt;OrganizationEntity&gt;
      *
      */
-    Page<OrganizationEntity> findByStatusAndDeactivate(Boolean status, Boolean deactivate, String name, Pageable pageable);
+    Page<OrganizationEntity> findByDeactivate(Boolean deactivate, String name, Pageable pageable);
 
 
     /**

@@ -63,7 +63,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Page<OrganizationResponseDTO> getOrganizationDetails(Pageable pageable, String searchValue) {
         System.out.println("organizationEntityList = " );
-        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByStatusAndDeactivate(true,
+        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByDeactivate(
         false, "%" + searchValue + "%", pageable);
         System.out.println("organizationEntityList = " + organizationEntityList.stream().toList());
         List<OrganizationResponseDTO> organizationResponseDTOList = this
