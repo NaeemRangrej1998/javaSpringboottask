@@ -20,9 +20,9 @@ public class SwaggerConfig {
 
 
         Info information = new Info()
-                .title("Employee Management System API")
+                .title("Organization API")
                 .version("1.0")
-                .description("This API exposes endpoints to manage employees.");
+                .description("This API exposes endpoints to manage organization.");
         return new OpenAPI().info(information).servers(List.of(server));
     }
 }
