@@ -117,7 +117,7 @@ public class OrganizationController {
      * @return ResponseEntity &lt;ApiResponse&gt;
      */
     @PutMapping(value = "/updateOrgnanization/{organizationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrganization(@PathVariable Long organizationId,@Valid @RequestBody OrganizationRequestDTO organizationRequestDTO ) {
+    public ResponseEntity<ApiResponse> updateOrganization(@PathVariable Long organizationId, @RequestBody OrganizationRequestDTO organizationRequestDTO ) {
 
         try {
             organizationRequestDTO.setId(organizationId);

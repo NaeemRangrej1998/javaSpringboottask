@@ -8,6 +8,7 @@ import com.crud_example.exception.CustomException;
 import com.crud_example.mapper.DtoMapper;
 import com.crud_example.repository.OrganizationRepository;
 import com.crud_example.service.OrganizationService;
+import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +21,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * <h1>OrganizationServiceImpl</h1>
  *
@@ -30,11 +33,14 @@ import java.util.Optional;
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
+
+    private ModelMapper modelMapper;
     private final DtoMapper dtoMapper;
 
-    public OrganizationServiceImpl(OrganizationRepository organizationRepository, final DtoMapper dtoMapper) {
+    public OrganizationServiceImpl(OrganizationRepository organizationRepository, final DtoMapper dtoMapper,final ModelMapper modelMapper) {
         this.organizationRepository = organizationRepository;
         this.dtoMapper = dtoMapper;
+        this.modelMapper=modelMapper;
     }
 
     @Override
@@ -50,8 +56,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationEntity.setContactNumber(organizationRequestDTO.getContactNumber());
 
         organizationEntity = organizationRepository.save(organizationEntity);
+        return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
 
-        return this.mapToOrganizationResponseDTO(organizationEntity);
+//        return this.mapToOrganizationResponseDTO(organizationEntity);
     }
 
     /**
@@ -63,11 +70,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Page<OrganizationResponseDTO> getOrganizationDetails(Pageable pageable, String searchValue) {
         System.out.println("organizationEntityList = " );
-        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByDeactivate(
+        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByDeactivateAndNameLike(
         false, "%" + searchValue + "%", pageable);
         System.out.println("organizationEntityList = " + organizationEntityList.stream().toList());
-        List<OrganizationResponseDTO> organizationResponseDTOList = this
-                .mapToListOfOrganizationResponseDTO(organizationEntityList.getContent());
+        List<OrganizationResponseDTO> organizationResponseDTOList =organizationEntityList.stream().map((org)->modelMapper.map(org   ,OrganizationResponseDTO.class)).collect(Collectors.toList());
+//        List<OrganizationResponseDTO> organizationResponseDTOList = this
+//                .mapToListOfOrganizationResponseDTO(organizationEntityList.getContent());
 
         return new PageImpl<>(organizationResponseDTOList, pageable, organizationEntityList.getTotalElements());
 
@@ -86,8 +94,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         OrganizationEntity organizationEntity = organizationRepository
                 .findByIdAndStatusAndDeactivate(id, true, false)
                 .orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
-        OrganizationResponseDTO responseDTO= dtoMapper.convertToDotWithStandardStrategy(organizationEntity,OrganizationResponseDTO.class);
-        return responseDTO;
+        return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
+//        OrganizationResponseDTO responseDTO= dtoMapper.convertToDotWithStandardStrategy(organizationEntity,OrganizationResponseDTO.class);
+//        return responseDTO;
     }
 
     /**
@@ -151,10 +160,11 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         organizationRepository.save(organizationEntity);
 
-        OrganizationResponseDTO organizationResponseDTO = this
-                .mapToOrganizationResponseDTO(organizationEntity);
+//        OrganizationResponseDTO organizationResponseDTO = this
+//                .mapToOrganizationResponseDTO(organizationEntity);
+        return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
 
-        return organizationResponseDTO;
+//        return organizationResponseDTO;
     }
 
     /**
