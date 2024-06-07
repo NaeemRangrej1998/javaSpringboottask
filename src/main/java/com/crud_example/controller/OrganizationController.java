@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import com.crud_example.enums.ApiResponsesEnum;
 
 import java.util.List;
+
 /**
  * <h1>OrganizationController</h1>
  * <p>
@@ -49,17 +50,17 @@ public class OrganizationController {
      */
     @PostMapping(value = "/addOranization", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> insertOrganization(@Valid @RequestBody
-            OrganizationRequestDTO organizationRequestDTO) {
+                                                          OrganizationRequestDTO organizationRequestDTO) {
         try {
             organizationRequestDTO.setId(null);
             OrganizationResponseDTO responseDTO = organizationService.insertUpdateOrganization(organizationRequestDTO);
 
             return new ResponseEntity<>(
-                    new ApiResponse(HttpStatus.OK, ApiResponsesEnum.ORGANIZATION_INSERTED_SUCCESSFULLY.getValue(),responseDTO),
+                    new ApiResponse(HttpStatus.OK, ApiResponsesEnum.ORGANIZATION_INSERTED_SUCCESSFULLY.getValue(), responseDTO),
                     HttpStatus.OK);
-        }  catch (CustomException e) {
+        } catch (CustomException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -67,23 +68,24 @@ public class OrganizationController {
     /**
      * <p>
      * This api is used  for get All  Organization Details
-     *  </p>
-     * @Param OrganizationRequestDTO it's contain organization details
+     * </p>
+     *
      * @return ResponseEntity &lt;ApiResponse&gt;
+     * @Param OrganizationRequestDTO it's contain organization details
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> getOrganization( @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
-                                                        @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
-                                                        @RequestParam(value = "searchValue", required = false, defaultValue = "") String searchValue,
-                                                        @RequestParam(value = "sortAs", required = false, defaultValue = "ASC") Sort.Direction sortAs) {
+    public ResponseEntity<ApiResponse> getOrganization(@RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
+                                                       @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                       @RequestParam(value = "searchValue", required = false, defaultValue = "") String searchValue,
+                                                       @RequestParam(value = "sortAs", required = false, defaultValue = "ASC") Sort.Direction sortAs) {
         try {
-            Pageable pageable= PageRequest.of(pageNo,pageSize,Sort.by(sortAs,"name"));
+            Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortAs, "id"));
             Page<OrganizationResponseDTO> organizationEntities = organizationService.getOrganizationDetails(pageable, searchValue.trim());
-            return new ResponseEntity<>(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_LIST.getValue(), organizationEntities),HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_LIST.getValue(), organizationEntities), HttpStatus.OK);
 
-        }   catch (CustomException e) {
+        } catch (CustomException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -91,7 +93,8 @@ public class OrganizationController {
     /**
      * <p>
      * This api is used  for save Organization Details
-     *  </p>
+     * </p>
+     *
      * @param orgId contain the organization Id
      * @return ResponseEntity &lt;ApiResponse&gt;
      */
@@ -99,11 +102,11 @@ public class OrganizationController {
     public ResponseEntity<ApiResponse> getOrganizationById(@PathVariable("orgId") Long orgId) {
         try {
             OrganizationResponseDTO organizationEntities = organizationService.getOrganizationDetailById(orgId);
-            return new ResponseEntity<>(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_LIST.getValue(), organizationEntities),HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_DETAILS.getValue(), organizationEntities), HttpStatus.OK);
 
-        }   catch (CustomException e) {
+        } catch (CustomException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -111,13 +114,13 @@ public class OrganizationController {
     /**
      * <p>
      * This api is used  for update Organization Details By orgId
-     *  </p>
+     * </p>
      *
      * @param OrganizationRequestDTO contain the organization details
      * @return ResponseEntity &lt;ApiResponse&gt;
      */
     @PutMapping(value = "/updateOrgnanization/{organizationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrganization(@PathVariable Long organizationId, @RequestBody OrganizationRequestDTO organizationRequestDTO ) {
+    public ResponseEntity<ApiResponse> updateOrganization(@PathVariable Long organizationId, @RequestBody OrganizationRequestDTO organizationRequestDTO) {
 
         try {
             organizationRequestDTO.setId(organizationId);
@@ -128,15 +131,16 @@ public class OrganizationController {
 
         } catch (CustomException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
+
     /**
      * <p>
      * This api is used  for update Organization status Details By orgId
-     *  </p>
+     * </p>
      *
      * @param {activeStatus} and orgId
      * @return ResponseEntity &lt;ApiResponse&gt;
@@ -149,7 +153,8 @@ public class OrganizationController {
             OrganizationResponseDTO responseDTO = organizationService.updateOrganizationStatus(organizationId, activeStatus);
             return new ResponseEntity<>(
                     new ApiResponse(HttpStatus.OK, ApiResponsesEnum.ORGANIZATION_STATUS_UPDATED_SUCCESSFULLY.getValue(), responseDTO),
-                    HttpStatus.OK);        } catch (CustomException e) {
+                    HttpStatus.OK);
+        } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
             throw new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.INTERNAL_SERVER_ERROR);

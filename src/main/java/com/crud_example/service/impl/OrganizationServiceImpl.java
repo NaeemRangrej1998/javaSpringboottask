@@ -9,7 +9,6 @@ import com.crud_example.mapper.DtoMapper;
 import com.crud_example.repository.OrganizationRepository;
 import com.crud_example.service.OrganizationService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -113,12 +110,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         // Check if organizationId is provided
         if (organizationRequestDTO.getId() != null) {
             // Fetch existing organization entity
-            organizationEntity = organizationRepository.findById(organizationRequestDTO.getId()).orElseThrow(() -> {
-                return new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
-            });
+            organizationEntity = organizationRepository.findById(organizationRequestDTO.getId()).orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
             organizationEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
             organizationEntity.setStatus(true);
-            organizationEntity.setStatus(false);
+            organizationEntity.setDeactivate(false);
         } else {
             System.out.println("organizationRequestDTO.getId() = " + organizationRequestDTO.getId());
                         // audit setter
@@ -131,13 +126,17 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         // Map the request DTO to the entity (this will update existing fields and preserve the created date for existing entities)
-        dtoMapper.updateToEntityWithFullTypeMatchingRequired(organizationRequestDTO, organizationEntity);
+                modelMapper.map(organizationRequestDTO, organizationEntity);
+//        dtoMapper.updateToEntityWithFullTypeMatchingRequired(organizationRequestDTO, organizationEntity);
         // Save the entity
-        organizationEntity = organizationRepository.save(organizationEntity);
-        // Map the saved entity to a response DTO
-        OrganizationResponseDTO organizationResponseDTO = this.mapToOrganizationResponseDTO(organizationEntity);
+        System.out.println("organizationEntity before = " + organizationEntity.getName());
 
-        return organizationResponseDTO;
+        organizationEntity = organizationRepository.save(organizationEntity);
+        System.out.println("organizationEntity = " + organizationEntity.getName());
+        // Map the saved entity to a response DTO
+        return modelMapper.map(organizationEntity, OrganizationResponseDTO.class);
+//        OrganizationResponseDTO organizationResponseDTO = this.mapToOrganizationResponseDTO(organizationEntity);
+//        return organizationResponseDTO;
     }
 
     /**
@@ -152,7 +151,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationResponseDTO updateOrganizationStatus(Long organizationId, Boolean activeStatus) {
         OrganizationEntity organizationEntity = organizationRepository.findById(organizationId).orElseThrow(() -> {
-            return new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.NOT_FOUND);
+            return new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
         });
         organizationEntity.setStatus(activeStatus);
 
@@ -174,14 +173,14 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @param organizationEntity
      * @return OrganizationResponseDTO
      */
-    private OrganizationResponseDTO mapToOrganizationResponseDTO(OrganizationEntity organizationEntity) {
-        return dtoMapper.convertToDotWithStandardStrategy(organizationEntity, OrganizationResponseDTO.class);
-    }
-
-    private List<OrganizationResponseDTO> mapToListOfOrganizationResponseDTO(
-            List<OrganizationEntity> organizationEntityList) {
-        return dtoMapper.mapListOfEntityToDTOWithStandardStrategy(organizationEntityList,
-                TypeToken.of(new TypeToken<List<OrganizationResponseDTO>>() {
-                }.getType()));
-    }
+//    private OrganizationResponseDTO mapToOrganizationResponseDTO(OrganizationEntity organizationEntity) {
+//        return dtoMapper.convertToDotWithStandardStrategy(organizationEntity, OrganizationResponseDTO.class);
+//    }
+//
+//    private List<OrganizationResponseDTO> mapToListOfOrganizationResponseDTO(
+//            List<OrganizationEntity> organizationEntityList) {
+//        return dtoMapper.mapListOfEntityToDTOWithStandardStrategy(organizationEntityList,
+//                TypeToken.of(new TypeToken<List<OrganizationResponseDTO>>() {
+//                }.getType()));
+//    }
 }
