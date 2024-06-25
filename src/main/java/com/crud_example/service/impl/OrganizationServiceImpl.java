@@ -90,7 +90,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     public OrganizationResponseDTO getOrganizationDetailById(Long id) {
         OrganizationEntity organizationEntity = organizationRepository
                 .findByIdAndStatusAndDeactivate(id, true, false)
-                .orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
         return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
 //        OrganizationResponseDTO responseDTO= dtoMapper.convertToDotWithStandardStrategy(organizationEntity,OrganizationResponseDTO.class);
 //        return responseDTO;
@@ -110,7 +110,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         // Check if organizationId is provided
         if (organizationRequestDTO.getId() != null) {
             // Fetch existing organization entity
-            organizationEntity = organizationRepository.findById(organizationRequestDTO.getId()).orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
+            organizationEntity = organizationRepository.findById(organizationRequestDTO.getId()).orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
             organizationEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
             organizationEntity.setStatus(true);
             organizationEntity.setDeactivate(false);
@@ -151,7 +151,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationResponseDTO updateOrganizationStatus(Long organizationId, Boolean activeStatus) {
         OrganizationEntity organizationEntity = organizationRepository.findById(organizationId).orElseThrow(() -> {
-            return new CustomException(ExceptionEnum.ORGANIZATION_ENTITY_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
+            return new CustomException(ExceptionEnum.ORGANIZATION_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
         });
         organizationEntity.setStatus(activeStatus);
 

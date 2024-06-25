@@ -30,8 +30,9 @@ import java.util.List;
  * getOrganizationById,changeOrganizationStatus, etc
  * </p>
  */
-@RequestMapping("/oranization")
+@RequestMapping("/organization")
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class OrganizationController {
 
     private final OrganizationService organizationService;
@@ -73,7 +74,7 @@ public class OrganizationController {
      * @return ResponseEntity &lt;ApiResponse&gt;
      * @Param OrganizationRequestDTO it's contain organization details
      */
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getAllUsers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> getOrganization(@RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
                                                        @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                                                        @RequestParam(value = "searchValue", required = false, defaultValue = "") String searchValue,
