@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RequestMapping("/organization")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins  = "*")
 public class OrganizationController {
 
     private final OrganizationService organizationService;
@@ -105,6 +105,17 @@ public class OrganizationController {
             OrganizationResponseDTO organizationEntities = organizationService.getOrganizationDetailById(orgId);
             return new ResponseEntity<>(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_DETAILS.getValue(), organizationEntities), HttpStatus.OK);
 
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException(ExceptionEnum.SOMETHING_WENT_WRONG.getValue(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping(value = "/{orgId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> deleteOrganizationById(@PathVariable("orgId") Long orgId) {
+        try {
+            organizationService.deleteOrganizationById(orgId);
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, ApiResponsesEnum.GET_ORGANIZATION_DETAILS.getValue()));
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {

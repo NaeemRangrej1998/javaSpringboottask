@@ -38,7 +38,7 @@ public class UserController {
                 HttpStatus.OK);
     }
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getAllUsers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> getAllUsers(@RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo,
                                                    @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                                                    @RequestParam(value = "searchValue", required = false, defaultValue = "") String searchValue,

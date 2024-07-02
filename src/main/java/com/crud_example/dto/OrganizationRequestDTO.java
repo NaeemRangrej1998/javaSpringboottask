@@ -18,7 +18,7 @@ public class OrganizationRequestDTO implements DTOEntity {
     @Size(min =4 , message = "Name should have atleast 2 characters")
     private String name;
     @NotNull
-    @Size(min =5 ,max = 30,message = "Location  should have atleast 20 characters")
+//    @Size(min =5 ,max = 30,message = "Location  should have atleast 20 characters")
     private String location;
     @NotBlank
     @Email

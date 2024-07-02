@@ -14,30 +14,31 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserEntity extends BaseEntityAudit{
+@Data
+public class UserEntity extends BaseEntityAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Size(min =4 , message = "firstName should have atleast 2 characters")
+    @Size(min = 4, message = "firstName should have atleast 2 characters")
     @Column(name = "first_name")
     private String firstName;
 
     @NotNull
-    @Size(min =4 , message = "lastName should have atleast 2 characters")
+    @Size(min = 4, message = "lastName should have atleast 2 characters")
     @Column(name = "last_name")
     private String lastName;
+
+    @Column(name = "password")
+    private String password;
 
     @NotBlank
     @Email
     @Column(name = "email")
     private String email;
-
-    @NotNull
-    @Size(min =4 , message = "roleName should have atleast 2 characters")
     @Column(name = "role_name")
-    private String roleName;
+    private String role;
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "org_id", referencedColumnName = "id")
     private OrganizationEntity organizationEntity;

@@ -27,7 +27,7 @@ public class OrganizationEntity extends BaseEntityAudit{
     private String name;
 
     @NotNull
-    @Size(min =5 ,max = 30,message = "Location  should have atleast 20 characters")
+//    @Size(min =5 ,max = 30,message = "Location  should have atleast 20 characters")
     @Column(name = "location")
     private String location;
 

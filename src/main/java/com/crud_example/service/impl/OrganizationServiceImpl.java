@@ -34,10 +34,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     private ModelMapper modelMapper;
     private final DtoMapper dtoMapper;
 
-    public OrganizationServiceImpl(OrganizationRepository organizationRepository, final DtoMapper dtoMapper,final ModelMapper modelMapper) {
+    public OrganizationServiceImpl(OrganizationRepository organizationRepository, final DtoMapper dtoMapper, final ModelMapper modelMapper) {
         this.organizationRepository = organizationRepository;
         this.dtoMapper = dtoMapper;
-        this.modelMapper=modelMapper;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationEntity.setContactNumber(organizationRequestDTO.getContactNumber());
 
         organizationEntity = organizationRepository.save(organizationEntity);
-        return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
+        return modelMapper.map(organizationEntity, OrganizationResponseDTO.class);
 
 //        return this.mapToOrganizationResponseDTO(organizationEntity);
     }
@@ -62,15 +62,15 @@ public class OrganizationServiceImpl implements OrganizationService {
      * <p>
      * Fetch Organization Details  it's active or deactivate. Implemented
      * </p>
+     *
      * @return OrganizationResponseDTO
      */
     @Override
     public Page<OrganizationResponseDTO> getOrganizationDetails(Pageable pageable, String searchValue) {
-        System.out.println("organizationEntityList = " );
-        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByDeactivateAndNameLike(
-        false, "%" + searchValue + "%", pageable);
+        System.out.println("organizationEntityList = ");
+        Page<OrganizationEntity> organizationEntityList = organizationRepository.findByDeactivateAndNameLike(false, "%" + searchValue + "%", pageable);
         System.out.println("organizationEntityList = " + organizationEntityList.stream().toList());
-        List<OrganizationResponseDTO> organizationResponseDTOList =organizationEntityList.stream().map((org)->modelMapper.map(org   ,OrganizationResponseDTO.class)).collect(Collectors.toList());
+        List<OrganizationResponseDTO> organizationResponseDTOList = organizationEntityList.stream().map((org) -> modelMapper.map(org, OrganizationResponseDTO.class)).collect(Collectors.toList());
 //        List<OrganizationResponseDTO> organizationResponseDTOList = this
 //                .mapToListOfOrganizationResponseDTO(organizationEntityList.getContent());
 
@@ -88,12 +88,20 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     @Override
     public OrganizationResponseDTO getOrganizationDetailById(Long id) {
-        OrganizationEntity organizationEntity = organizationRepository
-                .findByIdAndStatusAndDeactivate(id, true, false)
-                .orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
-        return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
+        OrganizationEntity organizationEntity = organizationRepository.findByIdAndStatusAndDeactivate(id, true, false).orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
+        return modelMapper.map(organizationEntity, OrganizationResponseDTO.class);
 //        OrganizationResponseDTO responseDTO= dtoMapper.convertToDotWithStandardStrategy(organizationEntity,OrganizationResponseDTO.class);
 //        return responseDTO;
+    }
+
+    @Override
+    public void deleteOrganizationById(Long orgId) {
+        OrganizationEntity organizationEntity = organizationRepository.findById(orgId).orElseThrow(() -> new CustomException(ExceptionEnum.ORGANIZATION_NOT_FOUND.getValue(), HttpStatus.NOT_FOUND));
+        organizationEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
+
+        organizationEntity.setStatus(Boolean.FALSE);
+        organizationEntity.setDeactivate(Boolean.TRUE);
+        organizationRepository.save(organizationEntity);
     }
 
     /**
@@ -116,17 +124,17 @@ public class OrganizationServiceImpl implements OrganizationService {
             organizationEntity.setDeactivate(false);
         } else {
             System.out.println("organizationRequestDTO.getId() = " + organizationRequestDTO.getId());
-                        // audit setter
-                        organizationEntity   = new OrganizationEntity();
-                        organizationEntity.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
-                        organizationEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
-                        // active / de-active setter
+            // audit setter
+            organizationEntity = new OrganizationEntity();
+            organizationEntity.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
+            organizationEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
+            // active / de-active setter
             organizationEntity.setStatus(Boolean.TRUE);
             organizationEntity.setDeactivate(Boolean.FALSE);
         }
 
         // Map the request DTO to the entity (this will update existing fields and preserve the created date for existing entities)
-                modelMapper.map(organizationRequestDTO, organizationEntity);
+        modelMapper.map(organizationRequestDTO, organizationEntity);
 //        dtoMapper.updateToEntityWithFullTypeMatchingRequired(organizationRequestDTO, organizationEntity);
         // Save the entity
         System.out.println("organizationEntity before = " + organizationEntity.getName());
@@ -161,7 +169,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 //        OrganizationResponseDTO organizationResponseDTO = this
 //                .mapToOrganizationResponseDTO(organizationEntity);
-        return modelMapper.map(organizationEntity,OrganizationResponseDTO.class);
+        return modelMapper.map(organizationEntity, OrganizationResponseDTO.class);
 
 //        return organizationResponseDTO;
     }

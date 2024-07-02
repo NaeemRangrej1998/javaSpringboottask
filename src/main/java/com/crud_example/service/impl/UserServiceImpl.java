@@ -9,42 +9,67 @@ import com.crud_example.exception.CustomException;
 import com.crud_example.repository.OrganizationRepository;
 import com.crud_example.repository.UserRepository;
 import com.crud_example.service.UserService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(OrganizationRepository organizationRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public UserServiceImpl(OrganizationRepository organizationRepository, UserRepository userRepository, ModelMapper modelMapper,PasswordEncoder passwordEncoder) {
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.passwordEncoder=passwordEncoder;
     }
 
     @Override
     public Page<UserDTO> getAllUser(Pageable pageable, String searchValue) {
+        Page<UserEntity> pageOfUser = userRepository.findByDeactivateAndFirstNameLike(false, "%" + searchValue + "%", pageable);
+        List<UserEntity> content = pageOfUser.getContent();
         Page<UserEntity> userEntityList = userRepository.findByDeactivateAndFirstNameLike(false, "%" + searchValue + "%", pageable);
-        List<UserDTO> UserDTOList = userEntityList.stream().map((user) -> modelMapper.map(user, UserDTO.class)).collect(Collectors.toList());
-        return new PageImpl<>(UserDTOList, pageable, userEntityList.getTotalElements());
+
+//        List<UserDTO> UserDTOList = userEntityList.stream().map((user) -> modelMapper.map(user, UserDTO.class)).collect(Collectors.toList());
+//        return new PageImpl<>(UserDTOList, pageable, userEntityList.getTotalElements());
+
 
 //        return userEntityList
 //                .stream()
 //                .map(element -> modelMapper.map(element, UserDTO.class))
 //                .collect(Collectors.toList());
+        List<UserDTO> userDTOS = new ArrayList();
+        
+        for(UserEntity user : content){
+            UserDTO userDto = modelMapper.map(user, UserDTO.class);
+            userDto.setOrganization(user.getOrganizationEntity().getId());
+            userDTOS.add(userDto);
+        }
+                return new PageImpl<>(userDTOS, pageable, userEntityList.getTotalElements());
+
+//        return  userDTOS;
+
+
     }
+
+//    private Object convertToDTO(UserEntity user) {
+//       
+//    }
 
     @Override
     public UserDTO getUserById(Long userId) {
@@ -66,6 +91,7 @@ public class UserServiceImpl implements UserService {
             userEntity.setUpdatedDate(LocalDateTime.now(ZoneOffset.UTC));
             userEntity.setStatus(true);
             userEntity.setDeactivate(false);
+            userEntity.setPassword(passwordEncoder.encode(requestUserDTO.getPassword()));
             userEntity.setOrganizationEntity(organizationEntity);
         } else {
             System.out.println("requestUserDTO.getId() = " + requestUserDTO.getId());
@@ -76,6 +102,7 @@ public class UserServiceImpl implements UserService {
             // active / de-active setter
             userEntity.setStatus(Boolean.TRUE);
             userEntity.setDeactivate(Boolean.FALSE);
+            userEntity.setPassword(passwordEncoder.encode(requestUserDTO.getPassword()));
             userEntity.setOrganizationEntity(organizationEntity);
         }
 

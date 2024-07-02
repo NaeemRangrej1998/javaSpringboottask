@@ -4,7 +4,8 @@ public enum ExceptionEnum {
 
     SOMETHING_WENT_WRONG("Something went wrong"),
     ORGANIZATION_NOT_FOUND("Organization Not Found"),
-    USER_NOT_FOUND("User  Not Found");
+    USER_NOT_FOUND("User  Not Found"),
+    ORGANIZATION_DELETED_SUCCESSFULLY("Organization Deleted Successfully");
     private String value;
 
     private String message;

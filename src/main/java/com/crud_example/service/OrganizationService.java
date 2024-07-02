@@ -39,6 +39,8 @@ public interface OrganizationService {
      *
      */
     OrganizationResponseDTO getOrganizationDetailById(Long id);
+
+    void  deleteOrganizationById(Long orgId);
     /**
      * <p>
      * updateOrganization Details

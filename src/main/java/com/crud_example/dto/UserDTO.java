@@ -25,6 +25,7 @@ public class UserDTO implements DTOEntity {
     private String firstName;
     private String lastName;
     private String email;
-    private String roleName;
+    private String password;
+    private String role;
     private Long organization;
 }
